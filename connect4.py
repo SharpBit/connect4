@@ -7,23 +7,19 @@ async def create_game():
     async with websockets.connect('ws://localhost:5000/create') as websocket:
         while True:
             resp = await websocket.recv()
+            print(resp)
             if resp == 'GAMESTART' or resp.startswith('OPPONENT'):
-                print(resp)
                 move = int(input('Column: '))
                 await websocket.send(f'PLAY:{move}')
-            else:
-                print(resp)
 
 async def join_game(game_id):
     async with websockets.connect(f'ws://localhost:5000/join/{game_id}') as websocket:
         while True:
             resp = await websocket.recv()
-            if resp == 'ACK' or resp.startswith('OPPONENT'):
-                print(resp)
+            print(resp)
+            if resp.startswith('OPPONENT'):
                 move = int(input('Column: '))
                 await websocket.send(f'PLAY:{move}')
-            else:
-                print(resp)
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
