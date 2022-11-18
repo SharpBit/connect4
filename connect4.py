@@ -2,21 +2,30 @@ import argparse
 import asyncio
 import websockets
 
+from enum import Enum
+
+
+class BoardState(Enum):
+    EMPTY = 0
+    PLAYER_ONE = 1
+    PLAYER_TWO = 2
+
+
 async def create_game(server_ip='localhost'):
     async with websockets.connect(f'ws://{server_ip}:5000/create') as websocket:
         while True:
-            resp = await websocket.recv()
+            resp = (await websocket.recv()).split(':')
             print(resp)
-            if resp == 'GAMESTART' or resp.startswith('OPPONENT'):
+            if resp[0] == 'GAMESTART' or resp[0] == 'OPPONENT':
                 move = int(input('Column: '))
                 await websocket.send(f'PLAY:{move}')
 
 async def join_game(game_id, server_ip='localhost'):
     async with websockets.connect(f'ws://{server_ip}:5000/join/{game_id}') as websocket:
         while True:
-            resp = await websocket.recv()
+            resp = (await websocket.recv()).split(':')
             print(resp)
-            if resp.startswith('OPPONENT'):
+            if resp[0] == 'OPPONENT':
                 move = int(input('Column: '))
                 await websocket.send(f'PLAY:{move}')
 
