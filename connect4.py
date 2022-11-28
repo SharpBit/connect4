@@ -34,11 +34,12 @@ class Board:
 
 async def ask_move(websocket) -> Tuple[Tuple, int]:
     resp = ('OK',)
+    move = None
     while resp[0] != 'ACK':
         if resp[0] == 'ERROR':
             print(resp)
         elif resp[0] in ('WIN', 'DRAW', 'LOSS'):
-            return resp, -1
+            return resp, move
         move = int(input('Column: '))
         await websocket.send(f'PLAY:{move}')
         resp = tuple((await websocket.recv()).split(':'))
@@ -58,7 +59,7 @@ async def create_game(server_ip='localhost'):
                 board.insert(Board.PLAYER_TWO, int(resp[1]))
                 print(board)
                 resp, move = await ask_move(websocket)
-                if move > 0:
+                if move is not None:
                     board.insert(Board.PLAYER_ONE, move)
                     print(board)
             if resp[0] in ('WIN', 'LOSS', 'DRAW'):
