@@ -31,6 +31,9 @@ class Board:
                 res += '\n' if c == cols - 1 else ' '
         return res
 
+# def get_score(bd):
+#     return None
+
 
 async def ask_move(websocket) -> Tuple[Tuple, int]:
     resp = ('OK',)
@@ -40,7 +43,7 @@ async def ask_move(websocket) -> Tuple[Tuple, int]:
             print(resp)
         elif resp[0] in ('WIN', 'DRAW', 'LOSS'):
             return resp, move
-        move = int(input('Column: '))
+        move = int(input('Column: ')) #REPLACE THIS WITH FUNCTION make sure returns int between 0-6
         await websocket.send(f'PLAY:{move}')
         resp = tuple((await websocket.recv()).split(':'))
     return resp, move

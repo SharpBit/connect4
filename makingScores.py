@@ -71,6 +71,7 @@ def max_score_move(bd):
     move3 = (get_open_row(bd,3) ,3)
     move4 = (get_open_row(bd,4) ,4)
     move5 = (get_open_row(bd,5) ,5)
+    move6 = (get_open_row(bd,6) ,6)
 
     # Now we get the max score of each one of those locations
     # Meaning: for each location we test the score they would be in every direction and 
@@ -131,27 +132,27 @@ def max_score_move(bd):
     print('SCORE 6 ------------------------------------------')
 
     #SCORE 6
-    score5 = 0 
+    score6 = 0 
 
     #going down
-    for i in range(1, len(bd)- get_open_row(bd,5)):
+    for i in range(1, len(bd)- get_open_row(bd,6)):
         print(i)
-        if bd[move5[0] +i][0] == 2:
+        if bd[move6[0] +i][0] == 2:
             break
-        elif bd[move5[0] +i][0] == 1:
+        elif bd[move6[0] +i][0] == 1:
             print('score+2')
-            score5 += 2
-            if score5 == 6:
-                score5 = 999999999999999 # if this score is reached at any point in the game, this move should be made
+            score6 += 2
+            if score6 == 6:
+                score6 = 999999999999999 # if this score is reached at any point in the game, this move should be made
 
 
     #going left
     # for i in range(1, len(bd[get_open_row(bd,0)]) - 0): --> WORNG RANGE BUT KINDA WORDS likely worse implementation 
     for i in range(1, 4):
         print(i)
-        if bd[move5[0]][0-i] == 2:
+        if bd[move6[0]][0-i] == 2:
             break
-        elif bd[get_open_row(bd,0)] [ move5[1] - i] == 1:
+        elif bd[get_open_row(bd,0)] [ move6[1] - i] == 1:
             print('score+2')
             score5 += 2
             if score5 == 6:
