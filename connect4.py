@@ -73,13 +73,13 @@ async def join_game(game_id, server_ip='localhost'):
             resp = tuple((await websocket.recv()).split(':'))
             print(resp)
             if resp[0] == 'OPPONENT':
-                board.insert(Board.PLAYER_ONE, int(resp[1]))
+                board.insert(Board.PLAYER_TWO, int(resp[1]))
                 print(board)
                 resp, move = await ask_move(websocket)
                 if resp[0] in ('WIN', 'LOSS', 'DRAW'):
                     print(resp[0])
                     break
-                board.insert(Board.PLAYER_TWO, move)
+                board.insert(Board.PLAYER_ONE, move)
                 print(board)
 
 if __name__ == '__main__':
