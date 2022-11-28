@@ -92,7 +92,7 @@ def max_score_move(bd):
             print('score+2')
             score0 += 2
             if score0 == 6:
-                score0 = 999999999999999 # if this score is reached at any point in the game, this move should be made
+                return 0 # if this score is reached at any point in the game, this move should be made
 
 
     #going right
@@ -105,7 +105,7 @@ def max_score_move(bd):
             print('score+2')
             score0 += 2
             if score0 == 6:
-                score0 = 999999999999999 # if this score is reached at any point in the game, this move should be made
+                return 0 # if this score is reached at any point in the game, this move should be made
 
     #going down right
     for i in range(1, min(4,(4-move0[0]))):
@@ -116,7 +116,7 @@ def max_score_move(bd):
             print('score+2')
             score0 += 2
             if score0 == 6:
-                score0 = 999999999999999
+                return 0
 
 
     #SCORE 1 
@@ -143,7 +143,7 @@ def max_score_move(bd):
             print('score+2')
             score6 += 2
             if score6 == 6:
-                score6 = 999999999999999 # if this score is reached at any point in the game, this move should be made
+                return 6 # if this score is reached at any point in the game, this move should be made
 
 
     #going left
@@ -156,7 +156,7 @@ def max_score_move(bd):
             print('score+2')
             score5 += 2
             if score5 == 6:
-                score5 = 999999999999999 # if this score is reached at any point in the game, this move should be made
+                return 6 # if this score is reached at any point in the game, this move should be made
 
     for i in range(1, min(4,(4-move5[0]))):
         print(i)
@@ -166,7 +166,7 @@ def max_score_move(bd):
             print('score+2')
             score5 += 2
             if score5 == 6:
-                score5 = 999999999999999
+                return 6
 
 
     
