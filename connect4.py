@@ -22,6 +22,9 @@ class Board:
         self.grid[col][self.first_empty[col]] = player
         self.first_empty[col] += 1
 
+    def get_position(self, row, col):
+        return self.grid[row][col]
+
     def __str__(self):
         rows = len(self.grid[0])
         cols = len(self.grid)
