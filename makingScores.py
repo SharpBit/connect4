@@ -158,6 +158,7 @@ def max_score_move(bd):
             if score5 == 6:
                 return 6 # if this score is reached at any point in the game, this move should be made
 
+    #going down left
     for i in range(1, min(4,(4-move5[0]))):
         print(i)
         if bd[move5[0]+i][0+i] == 2:
