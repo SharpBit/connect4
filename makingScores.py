@@ -64,228 +64,92 @@ def max_score_move(bd):
     I COULD NOT FIGURE OUT HOW TO RANDOMIZE A POSITION WITHIN THE MAX SCORES
     '''
 
-    # First we get the exact locations of the 6 possible moves (0-5)
-    move0 = (get_open_row(bd,0) ,0) 
-    move1 = (get_open_row(bd,1) ,1)
-    move2 = (get_open_row(bd,2) ,2)
-    move3 = (get_open_row(bd,3) ,3)
-    move4 = (get_open_row(bd,4) ,4)
-    move5 = (get_open_row(bd,5) ,5)
-    move6 = (get_open_row(bd,6) ,6)
-
     # Now we get the max score of each one of those locations
-    # Meaning: for each location we test the score they would be in every direction and 
+    # Meaning: for each location we test the score they would be in every direction and
     # the max score will be saved as the "score" for that location
-    
-
-    #SCORE 0
-    print('SCORE 0 ------------------------------------------')
-    score0 = 0 
 
     max_score = 0
+    best_move = 3  # default to the center
     for col in range(7):
-        move = (bd.first_empty[col], col) 
+        move = (bd.first_empty[col], col)
         print('SCORE 0 ------------------------------------------')
-        score = 0 
-        #going down
+        score = 0
+        # going down
         print('down')
-        for row in range(bd.first_empty[col] - 1, max(bd.first_empty[col] - 4, -1), -1):
-            print(row)
-            if bd[row][col] == 2:
+        # move[0] is the number of rows below the current row
+        # For example, there are 0 rows below row 0
+        # Since the end bound of range() is exclusive, we add 1
+        for dr in range(1, min(move[0] + 1, 4)):
+            if bd.get_position(move[0] - dr, move[1]) == bd.PLAYER_TWO:
+                # blocked in this direction by opponent, break
                 break
-            elif bd[row][col] == 1:
+            if bd.get_position(move[0] - dr, move[1]) == bd.PLAYER_ONE:
                 print('score+2')
                 score += 2
-                if score == 6:
+                if score >= 6:
                     print('WINN')
-                    return col # if this score is reached at any point in the game, this move should be made
+                    return move[1]  # if this score is reached at any point in the game, this move should be made
 
-        max_score = max(max_score, score)
+        if score > max_score:
+            max_score = score
+            best_move = move[1]
+
+        # going right
         score = 0
-
-        #going right
         print('right')
-        # for i in range(1, len(bd[get_open_row(bd,0)]) - 0): --> WORNG RANGE BUT KINDA WORDS likely worse implementation 
-        for i in range(1, min(4, 7 - move[1])):
-            print(i)
-            if bd[move[0]][col+i] == 2:
+        # bd.COLs - move[1] - 1 is the number of rows to the right of the current col
+        # For example, there are 0 rows to the right of col 6 (7 - 6 - 1 = 0)
+        # Since the end bound of range() is exclusive, we add 1, cancelling out the -1
+        for dc in range(1, min(bd.COLS - move[1], 4)):
+            if bd.get_position(move[0], move[1] + dc) == bd.PLAYER_TWO:
                 break
-            elif bd[move[0]][col+i] == 1:
+            elif bd.get_position(move[0], move[1] + dc) == bd.PLAYER_ONE:
                 print('score+2')
                 score += 2
-                if score == 6:
+                if score >= 6:
                     print('WINN')
-                    return col # if this score is reached at any point in the game, this move should be made
+                    return col  # if this score is reached at any point in the game, this move should be made
 
-        #going left
+        # going left
         print('left')
-        # for i in range(1, len(bd[get_open_row(bd,0)]) - 0): --> WORNG RANGE BUT KINDA WORDS likely worse implementation 
-        for i in range(move[1] - 1, max(-1, move[1] - 4), -1):
-            print(i)
-            if bd[move[0]][i] == 2:
+        # move[1] is the number of rows to the left of the current col
+        # For example, there are 0 rows to the right of col 0
+        # Since the end bound of range() is exclusive, we add 1
+        for dc in range(1, min(move[1] + 1, 4)):
+            if bd.get_position(move[0], move[1] - dc) == 2:
                 break
-            elif bd[move[0]][i] == 1:
+            elif bd.get_position(move[0], move[1] - dc) == 1:
                 print('score+2')
                 score += 2
-                if score == 6:
+                if score >= 6:
                     print('WINN')
-                    return col # if this score is reached at any point in the game, this move should be made
-        
-        max_score = max(max_score, score)  
+                    return col  # if this score is reached at any point in the game, this move should be made
+
+        if score > max_score:
+            max_score = score
+            best_move = move[1]
         score = 0
 
-        #going down right
+        # going down right
         print('down right')
-        for i in range(1, min(4,(4-move0[0]))):
-            print(i)
-            if bd[move0[0]+i][0+i] == 2:
+        for diag_offset in range(1, min(move[0] + 1, bd.COLS - move[1], 4)):
+            if bd.get_position(move[0] - diag_offset, move[1] + diag_offset) == bd.PLAYER_TWO:
                 break
-            elif bd[move0[0]+i][0+i] == 1:
+            elif bd.get_position(move[0] - diag_offset, move[1] + diag_offset) == 1:
                 print('score+2')
-                score0 += 2
-                if score0 == 6:
+                score += 2
+                if score >= 6:
                     print('WINN')
-                    return 0
+                    return move[1]
+
+        # up left
 
 
-    #SCORE 1
-    print('SCORE 1 ------------------------------------------') 
-    score1 = 0 
+        # reset scores here
 
-    #going down
-    print('down')
-    for i in range(1, len(bd)- get_open_row(bd,1)):
-        print(i)
-        if bd[move1[0] +i][1] == 2:
-            break
-        elif bd[move1[0] +i][1] == 1:
-            print('score+2')
-            score1 += 2
-            if score1 == 6:
-                print('WINN')
-                return 1 # if this score is reached at any point in the game, this move should be made
+        # down left
 
-    #SCORE 2
-    print('SCORE 2 ------------------------------------------') 
-    score2 =0 
-    
-    #going down
-    print('down')
-    for i in range(1, len(bd)- get_open_row(bd,2)):
-        print(i)
-        if bd[move2[0] +i][2] == 2:
-            break
-        elif bd[move2[0] +i][2] == 1:
-            print('score+2')
-            score2 += 2
-            if score2 == 6:
-                print('WINN')
-                return 2 # if this score is reached at any point in the game, this move should be made
-
-    
-
-    #SCORE 3
-    print('SCORE 3 ------------------------------------------') 
-    score3 =0 
-    
-    #going down
-    print('down')
-    for i in range(1, len(bd)- get_open_row(bd,3)):
-        print(i)
-        if bd[move3[0] +i][3] == 2:
-            break
-        elif bd[move3[0] +i][3] == 1:
-            print('score+2')
-            score3 += 2
-            if score3 == 6:
-                print('WINN')
-                return 3 # if this score is reached at any point in the game, this move should be made
-    
-
-    #SCORE 4
-    print('SCORE 4 ------------------------------------------') 
-    score4 = 0 
-
-    #going down
-    print('down')
-    for i in range(1, len(bd)- get_open_row(bd,4)):
-        print(i)
-        if bd[move4[0] +i][4] == 2:
-            break
-        elif bd[move4[0] +i][4] == 1:
-            print('score+2')
-            score4 += 2
-            if score4 == 6:
-                print('WINN')
-                return 4 # if this score is reached at any point in the game, this move should be made
-
-    #SCORE 5
-    print('SCORE 5 ------------------------------------------') 
-    score5 = 0
-
-    #going down
-    print('down')
-    for i in range(1, len(bd)- get_open_row(bd,5)):
-        print(i)
-        if bd[move6[0] +i][5] == 2:
-            break
-        elif bd[move5[0] +i][5] == 1:
-            print('score+2')
-            score5 += 2
-            if score5 == 6:
-                print('WINN')
-                return 5 # if this score is reached at any point in the game, this move should be made
-
-    #SCORE 6
-    print('SCORE 6 ------------------------------------------')
-    score6 = 0 
-
-    #going down
-    print('down')
-    for i in range(1, len(bd)- get_open_row(bd,6)):
-        print(i)
-        if bd[move6[0] +i][0] == 2:
-            break
-        elif bd[move6[0] +i][0] == 1:
-            print('score+2')
-            score6 += 2
-            if score6 == 6:
-                print('WINN')
-                return 6 # if this score is reached at any point in the game, this move should be made
-
-
-    #going left
-    print('left')
-    # for i in range(1, len(bd[get_open_row(bd,0)]) - 0): --> WORNG RANGE BUT KINDA WORDS likely worse implementation 
-    for i in range(1, 4):
-        print(i)
-        if bd[move6[0]][0-i] == 2:
-            break
-        elif bd[get_open_row(bd,0)] [ move6[1] - i] == 1:
-            print('score+2')
-            score6 += 2
-            if score6 == 6:
-                print('WINN')
-                return 6 # if this score is reached at any point in the game, this move should be made
-
-    #going down left
-    print('down left')
-    for i in range(1, min(4,(4-move6[0]))):
-        print(i)
-        if bd[move6[0]+i][0+i] == 2:
-            break
-        elif bd[move6[0]+i][0+i] == 1:
-            print('score+2')
-            score6 += 2
-            if score6 == 6:
-                print('WINN')
-                return 6
-
-
-    
-    scores = [score0,score1,score2,score3,score4,score5,score6]
-    best = max(scores)
-    best_move = scores.index(best)
+        # up right
 
     return best_move
 

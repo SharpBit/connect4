@@ -11,19 +11,21 @@ class Board:
     EMPTY = 0
     PLAYER_ONE = 1
     PLAYER_TWO = 2
+    ROWS = 6
+    COLS = 7
 
     def __init__(self):
         # 7x6 representation with self.grid[col][0] representing the bottom row of each col
         # and self.grid[col][5] representing the top row of each col
-        self.grid = [[self.EMPTY] * 6 for _ in range(7)]
-        self.first_empty = [0 for _ in range(7)]
+        self.grid = [[self.EMPTY] * self.ROWS for _ in range(self.COLS)]
+        self.first_empty = [0 for _ in range(self.COLS)]
 
     def insert(self, player: int, col: int):
         self.grid[col][self.first_empty[col]] = player
         self.first_empty[col] += 1
 
     def get_position(self, row, col):
-        return self.grid[row][col]
+        return self.grid[col][row]  # accessed by [col][row]
 
     def __str__(self):
         rows = len(self.grid[0])
