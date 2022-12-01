@@ -1,7 +1,8 @@
 import argparse
 import asyncio
-
+from AIbestColumn import minimax
 import websockets
+import math
 
 from typing import Tuple
 
@@ -35,7 +36,7 @@ class Board:
 #     return None
 
 
-async def ask_move(websocket) -> Tuple[Tuple, int]:
+async def ask_move(websocket,board) -> Tuple[Tuple, int]:
     resp = ('OK',)
     move = None
     while resp[0] != 'ACK':
@@ -43,7 +44,9 @@ async def ask_move(websocket) -> Tuple[Tuple, int]:
             print(resp)
         elif resp[0] in ('WIN', 'DRAW', 'LOSS'):
             return resp, move
-        move = int(input('Column: ')) #REPLACE THIS WITH FUNCTION make sure returns int between 0-6
+
+        move = minimax(board, 5, -math.inf, math.inf, True)[0] #REPLACE THIS WITH FUNCTION make sure returns int between 0-6
+        
         await websocket.send(f'PLAY:{move}')
         resp = tuple((await websocket.recv()).split(':'))
     return resp, move
@@ -61,7 +64,7 @@ async def create_game(server_ip='localhost'):
             elif resp[0] == 'OPPONENT':
                 board.insert(Board.PLAYER_TWO, int(resp[1]))
                 print(board)
-                resp, move = await ask_move(websocket)
+                resp, move = await ask_move(websocket,board)
                 if move is not None:
                     board.insert(Board.PLAYER_ONE, move)
                     print(board)
@@ -78,7 +81,7 @@ async def join_game(game_id, server_ip='localhost'):
             if resp[0] == 'OPPONENT':
                 board.insert(Board.PLAYER_TWO, int(resp[1]))
                 print(board)
-                resp, move = await ask_move(websocket)
+                resp, move = await ask_move(websocket,board)
                 if resp[0] in ('WIN', 'LOSS', 'DRAW'):
                     print(resp[0])
                     break

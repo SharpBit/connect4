@@ -203,6 +203,7 @@ RADIUS = int(SQUARESIZE/2 - 5)
 # turn = random.randint(PLAYER, AI)
 turn = PLAYER
 
+
 while not game_over:
 
 	# Ask for Player 1 Input
