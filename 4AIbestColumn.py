@@ -1,5 +1,5 @@
 '''
-Sdrastvoitea
+Returns the optimal column
 '''
 
 import numpy as np
