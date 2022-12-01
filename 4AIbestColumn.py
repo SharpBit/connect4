@@ -1,9 +1,6 @@
 '''
 Sdrastvoitea
 '''
-'''
-Credit to @KeithGalli
-'''
 
 import numpy as np
 import random
