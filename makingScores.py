@@ -71,8 +71,8 @@ def max_score_move(bd):
     max_score = 0
     best_move = 3  # default to the center
     for col in range(7):
-        # move = (bd.Board.first_empty[col], col)                           #
-        move = (get_open_row(bd,col),col) fist empty not working idk why so I switched to get_open_row
+        # move = (bd.Board.first_empty[col], col)                           
+        move = (get_open_row(bd,col),col) #fist empty not working idk why so I switched to get_open_row
         print('SCORE 0 ------------------------------------------')
         score = 0
 
