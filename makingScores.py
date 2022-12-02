@@ -1,7 +1,7 @@
 import numpy as np
 import random 
 import math
-
+from connect4 import Board
 # 1 is AI 2 is ENEMY
 
 b2 = np.zeros((6,7))
@@ -71,9 +71,11 @@ def max_score_move(bd):
     max_score = 0
     best_move = 3  # default to the center
     for col in range(7):
-        move = (bd.first_empty[col], col)
+        # move = (bd.Board.first_empty[col], col)                           #
+        move = (get_open_row(bd,col),col) fist empty not working idk why so I switched to get_open_row
         print('SCORE 0 ------------------------------------------')
         score = 0
+
         # going down
         print('down')
         # move[0] is the number of rows below the current row
@@ -143,13 +145,54 @@ def max_score_move(bd):
                     return move[1]
 
         # up left
+        print('up left')
+        for diag_offset in range(1, min(move[1] + 1, bd.ROWS - move[0], 4)):
+            if bd.get_position(move[0] + diag_offset, move[1] - diag_offset) == bd.PLAYER_TWO:
+                break
+            elif bd.get_position(move[0] + diag_offset, move[1] - diag_offset) == 1:
+                print('score+2')
+                score += 2
+                if score >= 6:
+                    print('WINN')
+                    return move[1]
 
-
-        # reset scores here
+        # reseting scores
+        if score > max_score:
+            max_score = score
+            best_move = move[1]
+        score = 0
 
         # down left
+        print('down left')
+        for diag_offset in range(1, min(4, move[1]+1, bd.COLUMNS-move[1])):
+            if bd.get_position(move[0] - diag_offset, move[1] - diag_offset) == bd.PLAYER_TWO:
+                break
+            elif bd.get_position(move[0] - diag_offset, move[1] - diag_offset) == 1:
+                print('score+2')
+                score += 2
+                if score >= 6:
+                    print('WINN')
+                    return move[1]
 
         # up right
+        print('up right')
+        for diag_offset in range(1, min(4,bd.COLUMNS-move[1],bd.ROWS-move[0])):
+            if bd.get_position(move[0] + diag_offset, move[1] + diag_offset) == bd.PLAYER_TWO:
+                break
+            elif bd.get_position(move[0] + diag_offset, move[1] + diag_offset) == 1:
+                print('score+2')
+                score += 2
+                if score >= 6:
+                    print('WINN')
+                    return move[1]
+
+
+        # reseting scores
+        if score > max_score:
+            max_score = score
+            best_move = move[1]
+        score = 0
+
 
     return best_move
 
