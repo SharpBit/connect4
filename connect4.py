@@ -1,9 +1,8 @@
 import argparse
 import asyncio
-from AIbestColumn import minimax
 import websockets
-import math
 
+from algorithm import get_best_move
 from typing import Tuple
 
 
@@ -24,10 +23,15 @@ class Board:
         self.grid[col][self.first_empty[col]] = player
         self.first_empty[col] += 1
 
-    def get_position(self, row, col):
+    def get_position(self, row: int, col: int) -> int:
+        '''Gets the space at a specific row and column'''
         return self.grid[col][row]  # accessed by [col][row]
 
-    def __str__(self):
+    def is_col_full(self, col: int) -> bool:
+        '''Returns whether or not a column is full'''
+        return col >= self.ROWS  # Row 6 or higher (col is full)
+
+    def __str__(self) -> str:
         rows = len(self.grid[0])
         cols = len(self.grid)
         res = ''
@@ -37,11 +41,8 @@ class Board:
                 res += '\n' if c == cols - 1 else ' '
         return res
 
-# def get_score(bd):
-#     return None
 
-
-async def ask_move(websocket,board) -> Tuple[Tuple, int]:
+async def ask_move(websocket, board: Board, human=False) -> Tuple[Tuple, int]:
     resp = ('OK',)
     move = None
     while resp[0] != 'ACK':
@@ -50,8 +51,10 @@ async def ask_move(websocket,board) -> Tuple[Tuple, int]:
         elif resp[0] in ('WIN', 'DRAW', 'LOSS'):
             return resp, move
 
-        move = minimax(board, 5, -math.inf, math.inf, True)[0] #REPLACE THIS WITH FUNCTION make sure returns int between 0-6
-        
+        if human:  # For debugging purposes
+            move = int(input('Enter a column: '))
+        else:
+            move = get_best_move(board)
         await websocket.send(f'PLAY:{move}')
         resp = tuple((await websocket.recv()).split(':'))
     return resp, move
@@ -63,13 +66,13 @@ async def create_game(server_ip='localhost'):
             resp = tuple((await websocket.recv()).split(':'))
             print(resp)
             if resp[0] == 'GAMESTART':
-                _, move = await ask_move(websocket)
+                _, move = await ask_move(websocket, board)
                 board.insert(Board.PLAYER_ONE, move)
                 print(board)
             elif resp[0] == 'OPPONENT':
                 board.insert(Board.PLAYER_TWO, int(resp[1]))
                 print(board)
-                resp, move = await ask_move(websocket,board)
+                resp, move = await ask_move(websocket, board)
                 if move is not None:
                     board.insert(Board.PLAYER_ONE, move)
                     print(board)
@@ -86,7 +89,7 @@ async def join_game(game_id, server_ip='localhost'):
             if resp[0] == 'OPPONENT':
                 board.insert(Board.PLAYER_TWO, int(resp[1]))
                 print(board)
-                resp, move = await ask_move(websocket,board)
+                resp, move = await ask_move(websocket, board, human=True)
                 if resp[0] in ('WIN', 'LOSS', 'DRAW'):
                     print(resp[0])
                     break
