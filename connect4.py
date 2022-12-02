@@ -6,6 +6,9 @@ from algorithm import get_best_move
 from typing import Tuple
 
 
+OUTCOME_RESPS = ('WIN', 'LOSS', 'DRAW')
+
+
 class Board:
     EMPTY = 0
     PLAYER_ONE = 1
@@ -48,7 +51,7 @@ async def ask_move(websocket, board: Board, human=False) -> Tuple[Tuple, int]:
     while resp[0] != 'ACK':
         if resp[0] == 'ERROR':
             print(resp)
-        elif resp[0] in ('WIN', 'DRAW', 'LOSS'):
+        elif resp[0] in OUTCOME_RESPS:
             return resp, move
 
         if human:  # For debugging purposes
@@ -73,10 +76,10 @@ async def create_game(server_ip='localhost'):
                 board.insert(Board.PLAYER_TWO, int(resp[1]))
                 print(board)
                 resp, move = await ask_move(websocket, board)
-                if move is not None:
+                if move is not None and resp[0] not in OUTCOME_RESPS:
                     board.insert(Board.PLAYER_ONE, move)
                     print(board)
-            if resp[0] in ('WIN', 'LOSS', 'DRAW'):
+            if resp[0] in OUTCOME_RESPS:
                 print(resp[0])
                 break
 
@@ -90,7 +93,7 @@ async def join_game(game_id, server_ip='localhost'):
                 board.insert(Board.PLAYER_TWO, int(resp[1]))
                 print(board)
                 resp, move = await ask_move(websocket, board, human=True)
-                if resp[0] in ('WIN', 'LOSS', 'DRAW'):
+                if resp[0] in OUTCOME_RESPS:
                     print(resp[0])
                     break
                 board.insert(Board.PLAYER_ONE, move)
