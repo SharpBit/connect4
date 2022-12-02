@@ -18,7 +18,8 @@ def get_best_move(bd):
         if bd.is_col_full(move[0]):  # Col is full, skip
             continue
         print('COLUMN:', col)
-        score = 0
+        target = None
+        scores = [0, 0]  # [AI score, opponent score]
 
         # move[0] is the number of rows below the current row
         # For example, there are 0 rows below row 0
@@ -39,93 +40,139 @@ def get_best_move(bd):
 
         # going down
         for dr in range(1, min(rows_below, 4)):
-            if bd.get_position(move[0] - dr, move[1]) == bd.PLAYER_TWO:
-                # blocked in this direction by opponent, break
+            piece = bd.get_position(move[0] - dr, move[1])
+            if not target and piece == bd.EMPTY:
+                continue
+            if not target:
+                target = piece
+            if piece == target:
+                scores[target - 1] += 1
+                if scores[0] >= 3 or scores[1] >= 3:
+                    # either we win or we block a winning spot
+                    return move[1]
+            elif piece != bd.EMPTY:  # opponent piece
                 break
-            if bd.get_position(move[0] - dr, move[1]) == bd.PLAYER_ONE:
-                score += 1
-                if score >= 3:
-                    return move[1]  # if this score is reached at any point in the game, this move should be made
 
-        print(f'down {score=}')
+        print(f'down {scores=}')
         # resetting scores
-        if score > max_score:
-            max_score = score
+        if scores[0] > max_score:
+            max_score = scores[0]
             best_move = move[1]
-        score = 0
+        target = None
+        scores = [0, 0]
 
         # going left
         for dc in range(1, min(cols_left, 4)):
-            if bd.get_position(move[0], move[1] - dc) == bd.PLAYER_TWO:
+            piece = bd.get_position(move[0], move[1] - dc)
+            if not target and piece == bd.EMPTY:
+                continue
+            if not target:
+                target = piece
+            if piece == target:
+                scores[target - 1] += 1
+                if scores[0] >= 3 or scores[1] >= 3:
+                    # either we win or we block a winning spot
+                    print('here1')
+                    return move[1]
+            elif piece != bd.EMPTY:  # opponent piece
                 break
-            elif bd.get_position(move[0], move[1] - dc) == bd.PLAYER_ONE:
-                score += 1
-                if score >= 3:
-                    return move[1]  # if this score is reached at any point in the game, this move should be made
 
         # going right
         for dc in range(1, min(cols_right, 4)):
-            if bd.get_position(move[0], move[1] + dc) == bd.PLAYER_TWO:
+            piece = bd.get_position(move[0], move[1] + dc)
+            if not target and piece == bd.EMPTY:
+                continue
+            if not target:
+                target = piece
+            if piece == target:
+                scores[target - 1] += 1
+                if scores[0] >= 3 or scores[1] >= 3:
+                    print('here2')
+                    # either we win or we block a winning spot
+                    return move[1]
+            elif piece != bd.EMPTY:  # opponent piece
                 break
-            elif bd.get_position(move[0], move[1] + dc) == bd.PLAYER_ONE:
-                score += 1
-                if score >= 3:
-                    return move[1]  # if this score is reached at any point in the game, this move should be made
 
-        print(f'left/right {score=}')
+        print(f'left/right {scores=}')
         # resetting scores
-        if score > max_score:
-            max_score = score
+        if scores[0] > max_score:
+            max_score = scores[0]
             best_move = move[1]
-        score = 0
+        target = None
+        scores = [0, 0]
 
         # going down right
         for diag_offset in range(1, min(rows_below, cols_right, 4)):
-            if bd.get_position(move[0] - diag_offset, move[1] + diag_offset) == bd.PLAYER_TWO:
-                break
-            elif bd.get_position(move[0] - diag_offset, move[1] + diag_offset) == bd.PLAYER_ONE:
-                score += 1
-                if score >= 3:
+            piece = bd.get_position(move[0] - diag_offset, move[1] + diag_offset)
+            if not target and piece == bd.EMPTY:
+                continue
+            if not target:
+                target = piece
+            if piece == target:
+                scores[target - 1] += 1
+                if scores[0] >= 3 or scores[1] >= 3:
+                    # either we win or we block a winning spot
                     return move[1]
+            elif piece != bd.EMPTY:  # opponent piece
+                break
 
         # up left
         for diag_offset in range(1, min(rows_above, cols_left, 4)):
-            if bd.get_position(move[0] + diag_offset, move[1] - diag_offset) == bd.PLAYER_TWO:
-                break
-            elif bd.get_position(move[0] + diag_offset, move[1] - diag_offset) == bd.PLAYER_ONE:
-                score += 1
-                if score >= 3:
+            piece = bd.get_position(move[0] + diag_offset, move[1] - diag_offset)
+            if not target and piece == bd.EMPTY:
+                continue
+            if not target:
+                target = piece
+            if piece == target:
+                scores[target - 1] += 1
+                if scores[0] >= 3 or scores[1] >= 3:
+                    # either we win or we block a winning spot
                     return move[1]
+            elif piece != bd.EMPTY:  # opponent piece
+                break
 
-        print(f'down right/up left {score=}')
+        print(f'down right/up left {scores=}')
         # resetting scores
-        if score > max_score:
-            max_score = score
+        if scores[0] > max_score:
+            max_score = scores[0]
             best_move = move[1]
-        score = 0
+        target = None
+        scores = [0, 0]
 
         # down left
         for diag_offset in range(1, min(rows_below, cols_left, 4)):
-            if bd.get_position(move[0] - diag_offset, move[1] - diag_offset) == bd.PLAYER_TWO:
-                break
-            elif bd.get_position(move[0] - diag_offset, move[1] - diag_offset) == bd.PLAYER_ONE:
-                score += 1
-                if score >= 3:
+            piece = bd.get_position(move[0] - diag_offset, move[1] - diag_offset)
+            if not target and piece == bd.EMPTY:
+                continue
+            if not target:
+                target = piece
+            if piece == target:
+                scores[target - 1] += 1
+                if scores[0] >= 3 or scores[1] >= 3:
+                    # either we win or we block a winning spot
                     return move[1]
+            elif piece != bd.EMPTY:  # opponent piece
+                break
 
         # up right
         for diag_offset in range(1, min(rows_above, cols_right, 4)):
-            if bd.get_position(move[0] + diag_offset, move[1] + diag_offset) == bd.PLAYER_TWO:
-                break
-            elif bd.get_position(move[0] + diag_offset, move[1] + diag_offset) == bd.PLAYER_ONE:
-                score += 1
-                if score >= 3:
+            piece = bd.get_position(move[0] + diag_offset, move[1] + diag_offset)
+            if not target and piece == bd.EMPTY:
+                continue
+            if not target:
+                target = piece
+            if piece == target:
+                scores[target - 1] += 1
+                if scores[0] >= 3 or scores[1] >= 3:
+                    # either we win or we block a winning spot
                     return move[1]
+            elif piece != bd.EMPTY:  # opponent piece
+                break
 
-        print(f'down left/up right {score=}')
+        print(f'down left/up right {scores=}')
         # resetting scores
-        if score > max_score:
-            max_score = score
+        if scores[0] > max_score:
+            max_score = scores[0]
             best_move = move[1]
         print(f'{col=} {max_score=} {best_move=}\n')
 
