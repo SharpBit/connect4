@@ -72,11 +72,11 @@ def get_best_move(bd):
                 scores[target - 1] += 1
                 if scores[0] >= 3 or scores[1] >= 3:
                     # either we win or we block a winning spot
-                    print('here1')
                     return move[1]
             elif piece != bd.EMPTY:  # opponent piece
                 break
 
+        target = None
         # going right
         for dc in range(1, min(cols_right, 4)):
             piece = bd.get_position(move[0], move[1] + dc)
@@ -87,7 +87,6 @@ def get_best_move(bd):
             if piece == target:
                 scores[target - 1] += 1
                 if scores[0] >= 3 or scores[1] >= 3:
-                    print('here2')
                     # either we win or we block a winning spot
                     return move[1]
             elif piece != bd.EMPTY:  # opponent piece
@@ -116,6 +115,7 @@ def get_best_move(bd):
             elif piece != bd.EMPTY:  # opponent piece
                 break
 
+        target = None
         # up left
         for diag_offset in range(1, min(rows_above, cols_left, 4)):
             piece = bd.get_position(move[0] + diag_offset, move[1] - diag_offset)
@@ -154,6 +154,7 @@ def get_best_move(bd):
             elif piece != bd.EMPTY:  # opponent piece
                 break
 
+        target = None
         # up right
         for diag_offset in range(1, min(rows_above, cols_right, 4)):
             piece = bd.get_position(move[0] + diag_offset, move[1] + diag_offset)
