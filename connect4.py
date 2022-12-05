@@ -28,7 +28,6 @@ class Board:
 
     def get_position(self, row: int, col: int) -> int:
         '''Gets the space at a specific row and column'''
-        print(row, col)
         return self.grid[col][row]  # accessed by [col][row]
 
     def is_col_full(self, col: int) -> bool:

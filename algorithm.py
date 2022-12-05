@@ -20,7 +20,6 @@ def get_best_move(bd) -> int:
         scores = [0, 0]  # [AI score, opponent score]
 
         def check_dir(move, direction: Tuple[int, int], board, opponent=False) -> bool:
-            print(opponent)
             dists_to_edge = {}
             # move[0] is the number of rows below the current row
             # For example, there are 0 rows below row 0
