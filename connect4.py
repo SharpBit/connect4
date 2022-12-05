@@ -45,7 +45,7 @@ class Board:
         return res
 
 
-async def ask_move(websocket, board: Board, human=False) -> Tuple[Tuple, int]:
+async def ask_move(websocket, board: Board, human=False, wait_ms=1000) -> Tuple[Tuple, int]:
     resp = ('OK',)
     move = None
     while resp[0] != 'ACK':
@@ -57,25 +57,27 @@ async def ask_move(websocket, board: Board, human=False) -> Tuple[Tuple, int]:
         if human:  # For debugging purposes
             move = int(input('Enter a column: '))
         else:
+            if wait_ms:
+                await asyncio.sleep(wait_ms / 1000)
             move = get_best_move(board)
         await websocket.send(f'PLAY:{move}')
         resp = tuple((await websocket.recv()).split(':'))
     return resp, move
 
-async def create_game(server_ip='localhost'):
+async def create_game(server_ip='localhost', human=False, wait_ms=1000):
     async with websockets.connect(f'ws://{server_ip}:5000/create') as websocket:
         board = Board()
         while True:
             resp = tuple((await websocket.recv()).split(':'))
             print(resp)
             if resp[0] == 'GAMESTART':
-                _, move = await ask_move(websocket, board)
+                _, move = await ask_move(websocket, board, human=human, wait_ms=wait_ms)
                 board.insert(Board.PLAYER_ONE, move)
                 print(board)
             elif resp[0] == 'OPPONENT':
                 board.insert(Board.PLAYER_TWO, int(resp[1]))
                 print(board)
-                resp, move = await ask_move(websocket, board)
+                resp, move = await ask_move(websocket, board, human=human)
                 if move is not None and resp[0] not in OUTCOME_RESPS:
                     board.insert(Board.PLAYER_ONE, move)
                     print(board)
@@ -83,7 +85,7 @@ async def create_game(server_ip='localhost'):
                 print(resp[0])
                 break
 
-async def join_game(game_id, server_ip='localhost'):
+async def join_game(game_id, server_ip='localhost', human=False, wait_ms=1000):
     async with websockets.connect(f'ws://{server_ip}:5000/join/{game_id}') as websocket:
         board = Board()
         while True:
@@ -92,7 +94,7 @@ async def join_game(game_id, server_ip='localhost'):
             if resp[0] == 'OPPONENT':
                 board.insert(Board.PLAYER_TWO, int(resp[1]))
                 print(board)
-                resp, move = await ask_move(websocket, board, human=True)
+                resp, move = await ask_move(websocket, board, human=human, wait_ms=wait_ms)
                 if resp[0] in OUTCOME_RESPS:
                     print(resp[0])
                     break
@@ -104,14 +106,16 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--create', action='store_true', help='Create a game.')
     parser.add_argument('-j', '--join', help='Join a game using the game ID.')
     parser.add_argument('--server_ip', default='localhost', help='The server IP to connect to (defaults to localhost)')
+    parser.add_argument('--human', action='store_true', help='Play as a human.')
+    parser.add_argument('--wait', type=int, default=1000, help='# milliseconds to wait before making a move as an AI.')
     args = parser.parse_args()
 
     if args.create and args.join:
         print('Cannot both create and join a game.')
         parser.print_help()
     elif args.create:
-        asyncio.run(create_game())
+        asyncio.run(create_game(server_ip=args.server_ip, human=args.human, wait_ms=args.wait))
     elif args.join:
-        asyncio.run(join_game(args.join))
+        asyncio.run(join_game(args.join, server_ip=args.server_ip, human=args.human, wait_ms=args.wait))
     else:
         parser.print_help()

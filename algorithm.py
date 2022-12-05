@@ -1,17 +1,12 @@
 from typing import Tuple
 
 
-def get_best_move(bd):
+def get_best_move(bd) -> int:
     '''
     For the 7 open spots, this function calculates which one has the greatest score
-    if the max scores are the same, the move is randomized (BETWEEN THE AMOUNT OF MAX SCORES )
-    PS. IF THERE ARE MULTIPLE MAX SCORES THE PIECE WILL BE PLACED IN THE RIGHTMOST MAX COLUMN
-    I COULD NOT FIGURE OUT HOW TO RANDOMIZE A POSITION WITHIN THE MAX SCORES
+    if the max scores are the same, the leftmost move is made. If an enemy has a winning move,
+    block that spot.
     '''
-
-    # Now we get the max score of each one of those locations
-    # Meaning: for each location we test the score they would be in every direction and
-    # the max score will be saved as the "score" for that location
 
     max_score = 0
     best_move = 3  # default to the center column
