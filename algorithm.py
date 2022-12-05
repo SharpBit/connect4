@@ -1,4 +1,5 @@
 from typing import Tuple
+import random
 
 
 def get_best_move(bd) -> int:
@@ -18,25 +19,26 @@ def get_best_move(bd) -> int:
         print('COLUMN:', col)
         scores = [0, 0]  # [AI score, opponent score]
 
-        dists_to_edge = {}
-        # move[0] is the number of rows below the current row
-        # For example, there are 0 rows below row 0
-        # Since the end bound of range() is exclusive, we add 1
-        dists_to_edge[(-1, 0)] = move[0] + 1
-        # bd.ROWS - move[0] - 1 is the number of rows above the current row
-        # For example, there are 0 rows above row 5 (6 - 5 - 1 = 0)
-        # Since the end bound of range() is exclusive, we add 1, cancelling out the -1
-        dists_to_edge[(1, 0)] = bd.ROWS - move[0]
-        # move[1] is the number of rows to the left of the current col
-        # For example, there are 0 rows to the right of col 0
-        # Since the end bound of range() is exclusive, we add 1
-        dists_to_edge[(0, -1)] = move[1] + 1
-        # bd.COLS - move[1] - 1 is the number of rows to the right of the current col
-        # For example, there are 0 rows to the right of col 6 (7 - 6 - 1 = 0)
-        # Since the end bound of range() is exclusive, we add 1, cancelling out the -1
-        dists_to_edge[(0, 1)] = bd.COLS - move[1]
-
         def check_dir(move, direction: Tuple[int, int], board, opponent=False) -> bool:
+            print(opponent)
+            dists_to_edge = {}
+            # move[0] is the number of rows below the current row
+            # For example, there are 0 rows below row 0
+            # Since the end bound of range() is exclusive, we add 1
+            dists_to_edge[(-1, 0)] = move[0] + 1
+            # bd.ROWS - move[0] - 1 is the number of rows above the current row
+            # For example, there are 0 rows above row 5 (6 - 5 - 1 = 0)
+            # Since the end bound of range() is exclusive, we add 1, cancelling out the -1
+            dists_to_edge[(1, 0)] = bd.ROWS - move[0]
+            # move[1] is the number of rows to the left of the current col
+            # For example, there are 0 rows to the right of col 0
+            # Since the end bound of range() is exclusive, we add 1
+            dists_to_edge[(0, -1)] = move[1] + 1
+            # bd.COLS - move[1] - 1 is the number of rows to the right of the current col
+            # For example, there are 0 rows to the right of col 6 (7 - 6 - 1 = 0)
+            # Since the end bound of range() is exclusive, we add 1, cancelling out the -1
+            dists_to_edge[(0, 1)] = bd.COLS - move[1]
+
             target = None
             dists_to_check = [4]
             if direction[0] != 0:
@@ -54,7 +56,9 @@ def get_best_move(bd) -> int:
                 if piece == target:
                     # don't need to declare scores as nonlocal since we are modifying, not reassigning
                     scores[target - 1] += 1
-                    if scores[0] >= 3 or scores[1] >= 3:
+                    if opponent and scores[1] >= 3:
+                        return True
+                    if not opponent and (scores[0] >= 3 or scores[1] >= 3):
                         # either we win or we block a winning spot
                         return True
                 elif piece != board.EMPTY:  # opponent piece
@@ -74,12 +78,13 @@ def get_best_move(bd) -> int:
         # going down
         if check_dir(move, (-1, 0), bd):
             return move[1]
-        if move[0] + 1 < ROWS and check_dir((move[0] + 1, move[1]), (-1, 0), bd, opponent=True):
-            pass
-
         print(f'down {scores=}')
         scores = [0, 0]
 
+        if move[0] + 1 < bd.ROWS:
+            next1 = check_dir((move[0] + 1, move[1]), (0, -1), bd, opponent=True)
+            next2 = check_dir((move[0] + 1, move[1]), (0, 1), bd, opponent=True)
+        scores = [0, 0]
         # going left
         if check_dir(move, (0, -1), bd):
             return move[1]
@@ -88,7 +93,14 @@ def get_best_move(bd) -> int:
             return move[1]
         print(f'left/right {scores=}')
         scores = [0, 0]
+        # we realized this move is bad, revert back
+        if move[0] + 1 < bd.ROWS and (next1 or next2):
+            best_move = random.choice([i for i in range(bd.COLS) if not bd.is_col_full(i) and i != move[1]])
 
+        if move[0] + 1 < bd.ROWS:
+            next1 = check_dir((move[0] + 1, move[1]), (-1, 1), bd, opponent=True)
+            next2 = check_dir((move[0] + 1, move[1]), (1, -1), bd, opponent=True)
+        scores = [0, 0]
         # down right
         if check_dir(move, (-1, 1), bd):
             return move[1]
@@ -97,7 +109,14 @@ def get_best_move(bd) -> int:
             return move[1]
         print(f'down right/up left {scores=}')
         scores = [0, 0]
+        # we realized this move is bad, revert back
+        if move[0] + 1 < bd.ROWS and (next1 or next2):
+            best_move = random.choice([i for i in range(bd.COLS) if not bd.is_col_full(i) and i != move[1]])
 
+        if move[0] + 1 < bd.ROWS:
+            next1 = check_dir((move[0] + 1, move[1]), (-1, -1), bd, opponent=True)
+            next2 = check_dir((move[0] + 1, move[1]), (1, 1), bd, opponent=True)
+        scores = [0, 0]
         # down left
         if check_dir(move, (-1, -1), bd):
             return move[1]
@@ -105,6 +124,9 @@ def get_best_move(bd) -> int:
         if check_dir(move, (1, 1), bd):
             return move[1]
         print(f'down left/up right {scores=}')
+        # we realized this move is bad, revert back
+        if move[0] + 1 < bd.ROWS and (next1 or next2):
+            best_move = random.choice([i for i in range(bd.COLS) if not bd.is_col_full(i) and i != move[1]])
 
         print(f'{col=} {max_score=} {best_move=}\n')
 
