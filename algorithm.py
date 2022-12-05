@@ -36,7 +36,7 @@ def get_best_move(bd) -> int:
         # Since the end bound of range() is exclusive, we add 1, cancelling out the -1
         dists_to_edge[(0, 1)] = bd.COLS - move[1]
 
-        def check_dir(direction: Tuple[int, int], board) -> bool:
+        def check_dir(move, direction: Tuple[int, int], board, opponent=False) -> bool:
             target = None
             dists_to_check = [4]
             if direction[0] != 0:
@@ -63,42 +63,46 @@ def get_best_move(bd) -> int:
             # It's fine to update scores for each direction and not each axis
             # since if the score increases in the other direction on the same axis later,
             # the score will update and reflect that
-            nonlocal max_score
-            nonlocal best_move
-            if scores[0] > max_score:
-                max_score = scores[0]
-                best_move = move[1]
+            if not opponent:
+                nonlocal max_score
+                nonlocal best_move
+                if scores[0] > max_score:
+                    max_score = scores[0]
+                    best_move = move[1]
             return False
 
         # going down
-        if check_dir((-1, 0), bd):
+        if check_dir(move, (-1, 0), bd):
             return move[1]
+        if move[0] + 1 < ROWS and check_dir((move[0] + 1, move[1]), (-1, 0), bd, opponent=True):
+            pass
+
         print(f'down {scores=}')
         scores = [0, 0]
 
         # going left
-        if check_dir((0, -1), bd):
+        if check_dir(move, (0, -1), bd):
             return move[1]
         # going right
-        if check_dir((0, 1), bd):
+        if check_dir(move, (0, 1), bd):
             return move[1]
         print(f'left/right {scores=}')
         scores = [0, 0]
 
         # down right
-        if check_dir((-1, 1), bd):
+        if check_dir(move, (-1, 1), bd):
             return move[1]
         # up left
-        if check_dir((1, -1), bd):
+        if check_dir(move, (1, -1), bd):
             return move[1]
         print(f'down right/up left {scores=}')
         scores = [0, 0]
 
         # down left
-        if check_dir((-1, -1), bd):
+        if check_dir(move, (-1, -1), bd):
             return move[1]
         # up right
-        if check_dir((1, 1), bd):
+        if check_dir(move, (1, 1), bd):
             return move[1]
         print(f'down left/up right {scores=}')
 
